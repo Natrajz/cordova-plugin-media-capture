@@ -168,7 +168,7 @@
  *  UIImage* image - the UIImage data returned from the camera
  *  NSString* callbackId
  */
-- (CDVPluginResult*)processImage:(UIImage*)image type:(NSString*)mimeType forCallbackId:(NSString*)callbackId
+- (CDVPluginResult*)processImageprocessImage:(UIImage*)image type:(NSString*)mimeType forCallbackId:(NSString*)callbackId
 {
     CDVPluginResult* result = nil;
 
@@ -210,6 +210,62 @@
 
     return result;
 }
+
+- (CDVPluginResult*)generateThumbnail: (NSString*)fullPath
+{
+	
+    CDVPluginResult* result = nil;
+	
+	UIImage* image = nil;
+	
+	NSURL *url = [NSURL fileURLWithPath:fullPath];
+	
+	int32_t preferredTimeScale = 600;
+	float atTime = 2;
+	
+	CMTime time = CMTimeMakeWithSeconds(atTime, preferredTimeScale);
+	
+	AVAsset *asset = [AVAsset assetWithURL:url];
+	
+    AVAssetImageGenerator *imageGenerator = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+	
+    imageGenerator.requestedTimeToleranceAfter = kCMTimeZero; // needed to get a precise time (http://stackoverflow.com/questions/5825990/i-cannot-get-a-precise-cmtime-for-generating-still-image-from-1-8-second-video)
+    imageGenerator.requestedTimeToleranceBefore = kCMTimeZero; // ^^
+    imageGenerator.appliesPreferredTrackTransform = YES; // crucial to have the right orientation for the image (http://stackoverflow.com/questions/9145968/getting-video-snapshot-for-thumbnail)
+	
+    CGImageRef imageRef = [imageGenerator copyCGImageAtTime:time actualTime:NULL error:NULL];
+    image = [UIImage imageWithCGImage:imageRef];
+    CGImageRelease(imageRef);  // CGImageRef won't be released by ARC
+
+    // save the image to photo album
+    UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
+
+    NSData* data = nil;
+    
+	data = UIImageJPEGRepresentation(image, 0.5);
+    
+    // write to temp directory and return URI
+    NSString* docsPath = [NSTemporaryDirectory()stringByStandardizingPath];   // use file system temporary directory
+    NSError* err = nil;
+    NSFileManager* fileMgr = [[NSFileManager alloc] init];
+
+    // generate unique file name
+    NSString* filePath;
+    int i = 1;
+    do {
+        filePath = [NSString stringWithFormat:@"%@/photo_%03d.jpg", docsPath, i++];
+    } while ([fileMgr fileExistsAtPath:filePath]);
+
+    if (![data writeToFile:filePath options:NSAtomicWrite error:&err]) {
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_IO_EXCEPTION messageToErrorObject:CAPTURE_INTERNAL_ERR];
+        if (err) {
+            NSLog(@"Error saving image: %@", [err localizedDescription]);
+        }
+		
+    return filePath;
+}
+
+
 
 - (void)captureVideo:(CDVInvokedUrlCommand*)command
 {
@@ -486,8 +542,10 @@
 
 - (NSDictionary*)getMediaDictionaryFromPath:(NSString*)fullPath ofType:(NSString*)type
 {
+	NSURL * thumbnailfileURL = [self generateThumbnail:fullPath];
+
     NSFileManager* fileMgr = [[NSFileManager alloc] init];
-    NSMutableDictionary* fileDict = [NSMutableDictionary dictionaryWithCapacity:5];
+    NSMutableDictionary* fileDict = [NSMutableDictionary dictionaryWithCapacity:6];
 
     CDVFile *fs = [self.commandDelegate getCommandInstance:@"File"];
 
@@ -500,6 +558,12 @@
 
     [fileDict setObject:[fullPath lastPathComponent] forKey:@"name"];
     [fileDict setObject:fullPath forKey:@"fullPath"];
+	
+	if(thumbnailfileURL){
+		[fileDict setObject:thumbnailfileURL forKey:@"thumbnailfileURL"];	
+	}
+    
+	
     if (url) {
         [fileDict setObject:[url absoluteURL] forKey:@"localURL"];
     }
