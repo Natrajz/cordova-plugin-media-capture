@@ -242,7 +242,7 @@
 
     NSData* data = nil;
     
-	data = UIImageJPEGRepresentation(image, 0.5);
+	data = UIImageJPEGRepresentation(image, 0.8);
     
     // write to temp directory and return URI
     NSString* docsPath = [NSTemporaryDirectory()stringByStandardizingPath];   // use file system temporary directory
@@ -252,18 +252,23 @@
     // generate unique file name
     NSString* filePath;
     int i = 1;
+	NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"dd.MM.YY-HH:mm:ss"];
+    NSDate *currentDate = [NSDate date];
+    NSString *dateString = [formatter stringFromDate:currentDate];
+    NSLog(@"datestring %@",dateString);
+	
     do {
-        filePath = [NSString stringWithFormat:@"%@/photo_%03d.jpg", docsPath, i++];
+        filePath = [NSString stringWithFormat:@"%@/photo_%03d.jpg", docsPath, dateString];
     } while ([fileMgr fileExistsAtPath:filePath]);
 
     if (![data writeToFile:filePath options:NSAtomicWrite error:&err]) {
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_IO_EXCEPTION messageToErrorObject:CAPTURE_INTERNAL_ERR];
+        // result = [CDVPluginResult resultWithStatus:CDVCommandStatus_IO_EXCEPTION messageToErrorObject:CAPTURE_INTERNAL_ERR];
         if (err) {
             NSLog(@"Error saving image: %@", [err localizedDescription]);
         }
-		
-    return filePath;
-}
+	}
+	return filePath;
 }
 
 
@@ -559,9 +564,12 @@
 
     [fileDict setObject:[fullPath lastPathComponent] forKey:@"name"];
     [fileDict setObject:fullPath forKey:@"fullPath"];
-	
+	 
 	if(thumbnailfileURL){
 		[fileDict setObject:thumbnailfileURL forKey:@"thumbnailfileURL"];	
+	}else {
+		NSString *noThumbnail = "No URL found";
+		[fileDict setObject:noThumbnail forKey:@"thumbnailfileURL"];
 	}
     
 	
