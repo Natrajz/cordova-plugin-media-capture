@@ -568,7 +568,7 @@
 	if(thumbnailfileURL){
 		[fileDict setObject:thumbnailfileURL forKey:@"thumbnailfileURL"];	
 	}else {
-		NSString *noThumbnail = "No URL found";
+		NSString *noThumbnail = @"No URL found";
 		[fileDict setObject:noThumbnail forKey:@"thumbnailfileURL"];
 	}
     
