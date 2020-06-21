@@ -548,10 +548,10 @@
 
 - (NSDictionary*)getMediaDictionaryFromPath:(NSString*)fullPath ofType:(NSString*)type
 {
-	NSURL * thumbnailfileURL = [self generateThumbnail:fullPath];
+	NSURL * thumbnailURL = [self generateThumbnail:fullPath];
 
     NSFileManager* fileMgr = [[NSFileManager alloc] init];
-    NSMutableDictionary* fileDict = [NSMutableDictionary dictionaryWithCapacity:6];
+    NSMutableDictionary* fileDict = [NSMutableDictionary dictionary];
 
     CDVFile *fs = [self.commandDelegate getCommandInstance:@"File"];
 
@@ -564,12 +564,12 @@
 
     [fileDict setObject:[fullPath lastPathComponent] forKey:@"name"];
     [fileDict setObject:fullPath forKey:@"fullPath"];
-	 
-	if(thumbnailfileURL){
-		[fileDict setObject:thumbnailfileURL forKey:@"thumbnailfileURL"];	
+	
+	if(thumbnailURL){
+	[fileDict setObject:[thumbnailURL] forKey:@"thumbnailURL"];	
 	}else {
 		NSString *noThumbnail = @"No URL found";
-		[fileDict setObject:noThumbnail forKey:@"thumbnailfileURL"];
+		[fileDict setObject:noThumbnail forKey:@"thumbnailURL"];
 	}
     
 	
