@@ -566,7 +566,8 @@
     [fileDict setObject:fullPath forKey:@"fullPath"];
 	
     if(thumbnailURL){
-	[fileDict setObject:thumbnailURL forKey:@"thumbnailURL"];	
+	 NSURL *thumbnailfileURL = [NSURL URLWithString:[NSString stringWithFormat:@"file://%@", thumbnailURL]];
+	[fileDict setObject:thumbnailfileURL forKey:@"thumbnailURL"];	
     }else {
 	 NSString *noThumbnail = @"No URL found";
 	 [fileDict setObject:noThumbnail forKey:@"thumbnailURL"];
@@ -589,7 +590,7 @@
     [fileDict setObject:[NSNumber numberWithUnsignedLongLong:[fileAttrs fileSize]] forKey:@"size"];
     NSDate* modDate = [fileAttrs fileModificationDate];
     NSNumber* msDate = [NSNumber numberWithDouble:[modDate timeIntervalSince1970] * 1000];
-    [fileDict setObject:thumbnailURL forKey:@"lastModifiedDate"];
+    [fileDict setObject:thumbnailfileURL forKey:@"lastModifiedDate"];
 
     return fileDict;
 }
