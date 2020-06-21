@@ -548,7 +548,7 @@
 
 - (NSDictionary*)getMediaDictionaryFromPath:(NSString*)fullPath ofType:(NSString*)type
 {
-	NSURL * thumbnailURL = [self generateThumbnail:fullPath];
+    NSURL *thumbnailURL = [self generateThumbnail:fullPath];
 
     NSFileManager* fileMgr = [[NSFileManager alloc] init];
     NSMutableDictionary* fileDict = [NSMutableDictionary dictionary];
@@ -565,12 +565,12 @@
     [fileDict setObject:[fullPath lastPathComponent] forKey:@"name"];
     [fileDict setObject:fullPath forKey:@"fullPath"];
 	
-	if(thumbnailURL){
+    if(thumbnailURL){
 	[fileDict setObject:thumbnailURL forKey:@"thumbnailURL"];	
-	}else {
-		NSString *noThumbnail = @"No URL found";
-		[fileDict setObject:noThumbnail forKey:@"thumbnailURL"];
-	}
+    }else {
+	 NSString *noThumbnail = @"No URL found";
+	 [fileDict setObject:noThumbnail forKey:@"thumbnailURL"];
+    }
     
 	
     if (url) {
@@ -589,7 +589,7 @@
     [fileDict setObject:[NSNumber numberWithUnsignedLongLong:[fileAttrs fileSize]] forKey:@"size"];
     NSDate* modDate = [fileAttrs fileModificationDate];
     NSNumber* msDate = [NSNumber numberWithDouble:[modDate timeIntervalSince1970] * 1000];
-    [fileDict setObject:msDate forKey:@"lastModifiedDate"];
+    [fileDict setObject:thumbnailURL forKey:@"lastModifiedDate"];
 
     return fileDict;
 }
