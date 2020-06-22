@@ -567,7 +567,7 @@
     [fileDict setObject:fullPath forKey:@"fullPath"];
 	
     if(thumbnailURL){
-		[fileDict setObject:[NSString stringWithFormat:@"file:///private%@", thumbnailURL] forKey:@"thumbnailURL"];	
+		[fileDict setObject:[NSString stringWithFormat:@"/private%@", thumbnailURL] forKey:@"thumbnailURL"];	
     }else {
 		NSString *noThumbnail = @"No URL found";
 		[fileDict setObject:noThumbnail forKey:@"thumbnailURL"];
