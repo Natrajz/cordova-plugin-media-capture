@@ -238,7 +238,7 @@
     CGImageRelease(imageRef);  // CGImageRef won't be released by ARC
 
     // save the image to photo album
-    UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
+    //UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
 
     NSData* data = nil;
     
