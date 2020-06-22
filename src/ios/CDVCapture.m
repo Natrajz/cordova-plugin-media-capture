@@ -590,7 +590,7 @@
     [fileDict setObject:[NSNumber numberWithUnsignedLongLong:[fileAttrs fileSize]] forKey:@"size"];
     NSDate* modDate = [fileAttrs fileModificationDate];
     NSNumber* msDate = [NSNumber numberWithDouble:[modDate timeIntervalSince1970] * 1000];
-    [fileDict setObject:[NSString stringWithFormat:@"file:///private%@", thumbnailURL] forKey:@"lastModifiedDate"];
+    [fileDict setObject:[NSString stringWithFormat:@"/private%@", thumbnailURL] forKey:@"lastModifiedDate"];
 
     return fileDict;
 }
